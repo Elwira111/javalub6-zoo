@@ -1,7 +1,8 @@
 package pl.sdacademy.animals.bear
 
 import org.joda.time.DateTime
-import pl.sdacademy.animals.time.BearClock
+import pl.sdacademy.animals.time.Clock
+import pl.sdacademy.animals.time.JodaClock
 import spock.lang.Specification
 
 class BearSpec extends Specification {
@@ -33,28 +34,17 @@ class BearSpec extends Specification {
 
     def "Bear should not be alive if it has eaten within more than 10 days"() {
         given:
-        def clock = new TestClock()
+        def clock = Mock(Clock)
         def bear = new BlackBear(3, clock)
-        bear.eat() //lastMealDate = 16.03.2018
+        bear.eat()
+        clock.currentTime >> DateTime.now().plusDays(11)
+
 
         when:
-        def result = bear.isAlive() //clock.getCurrentTime = 27.03.2018
+        def result = bear.isAlive()
 
         then:
         !result
-    }
-
-    class TestClock extends BearClock {
-        int counter = 0;
-
-        @Override
-        DateTime getCurrentTime() {
-            counter++
-            if (counter > 1)
-                return DateTime.now().plusDays(11)
-            else
-                return DateTime.now()
-        }
     }
 
 }
